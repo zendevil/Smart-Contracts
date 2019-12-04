@@ -1,15 +1,8 @@
 # Derivative Contracts created for the Ethereum blockchain
 
-## Introduction
-As described by the creator of Bitcoin, the so-called Satoshi Nakamoto, Bitcoin is a “Peer-to-Peer Electronic Cash System”. This is to say that transacting parties do not need a trusted party, like a bank, to avoid double-spending. Using old-fashioned physical cash for transactions doesn’t require a trusted party, but there was no way to do transactions electronically without a trusted party before the advent of Bitcoin. \cite{Bitcoin}
-The Bitcoin protocol provides a Turing incomplete scripting language that can be used to create rudimentary “smart-contracts”, defined by Nick Szabo, who first conceived of them in 1996 as “a set of promises, specified in a digital form, including protocols within which the parties perform on these promises.” A simple example of a smart contract is a vending machine. The terms of the contract are automatically deployed when the certain state is encountered. In the case of the vending machine, the soda is deployed when the vending machine finds itself in the state of “coins inputted”. Since Bitcoin’s scripting language for smart contracts is Turing Incomplete, it cannot compute everything that is computable, suggesting that there are contracts that cannot be written in Bitcoin’s scripting language. Even if writing a certain contract is possible to write, Bitcoin’s scripting language isn’t user friendly. 
-In 2009, the cryptocurrency Ethereum was launched. Ethereum provided a Turing Complete programming language, called Solidity, for writing smart contracts. With Solidity, it’s possible to create complex contracts involving derivatives and assets. We have implemented the forward contract using the Solidity language. These contracts are ubiquitous, but require a trusted party that acts as an intermediary. Our implementation makes sure that the buyer’s ether is put into an escrow, and is only delivered to the seller once the buyer confirms that he has received the asset. We also discuss the limitations and vulnerabilities of the implementations. \cite{Ethereum}
-The full source code can be found at https://github.com/zendevil/Smart-Contracts.git
-
-
 ## Forward Contract
 
-“A forward contract, or simply a forward, is an agreement between two counterparties to trade a specific asset, for example a stock, at a certain future time T and at a certain price K.”\cite{Blyth} A forward contract consists of a long party, the party who agrees to buy the asset, and the short party, the party who agrees to sell the asset. The Solidity implementation consists of the following global variables: 
+A forward contract consists of a long party, the party who agrees to buy the asset, and the short party, the party who agrees to sell the asset. The Solidity implementation consists of the following global variables: 
 
 ```   	   	     
   uint public deliveryPrice;                                                                                                                                                                                                                  
