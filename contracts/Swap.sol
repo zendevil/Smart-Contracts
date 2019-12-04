@@ -1,0 +1,120 @@
+pragma solidity ^0.5.12;
+
+contract Swap {
+
+  uint public fixedRate;
+  uint public timeInterval; 
+  uint public T; // maturity
+
+  address payable fixedLeg;
+  address payable floatingLeg;
+  
+  enum State { Created, FloatingOffered, FixedOffered, FixedSent, FloatingSent, Inactive }
+  State public state;
+
+  event FloatingOffered(address floatingLeg);
+  event FixedOffered(address fixedLeg);
+  event ContractActive(address sender, uint receiver, uint amount);
+  event FixedPaymentSent(address sender, address receiver, uint amount);
+  event FloatingPaymentSent(address sender, address receiver, uint amount);
+  
+  modifier onlyFloatingLeg() {
+    require(
+            msg.sender == floatingLeg,
+            "Only Long Party can call this."
+	    );
+    _;
+  }
+
+
+  modifier onlyFixedLeg() {
+    require(
+            msg.sender == fixedLeg,
+            "Only Short Party can call this."
+	    );
+    _;
+  }
+  
+  modifier inState(State _state) {
+    require(
+            state == _state,
+            "Invalid state."
+	    );
+    _;
+  }
+
+  modifier condition(bool _condition) {
+    require(_condition);
+    _;
+  }
+
+  
+  constructor() public {
+    state = State.Created;
+  }
+  
+  function offerFloating(uint _T)
+    public
+    payable
+    inState(State.Created)
+    returns (bool success)
+  {
+    floatingLeg = msg.sender;
+    emit FloatingOffered(floatingLeg);
+    T = _T;
+    state = State.FloatingOffered;
+    return true;
+  }
+
+  function offerFixed()
+    public
+    payable
+    inState(State.FloatingOffered)
+    condition(msg.sender != floatingLeg)
+  {
+    fixedLeg = msg.sender;
+    state = State.FixedOffered;
+    emit FixedOffered(msg.sender);
+  }
+
+  function agreeFixed()
+    public
+    payable
+    inState(State.FixedOffered)
+    onlyFloatingLeg
+  {
+    state = State.FloatingSent;
+  }
+
+  uint amountToSend;
+
+  function sendFixed()
+    public
+    
+    onlyFixedLeg
+    inState(State.FloatingSent)
+    condition(now <= T)
+    condition(msg.value >= timeInterval * fixedRate)
+    payable
+  {
+    amountToSend = msg.value;
+    emit FixedPaymentSent(fixedLeg, floatingLeg, msg.value);
+  }
+
+  uint liborRate = 10; 
+  function sendFloating(uint forTime)
+    public
+    payable
+    onlyFloatingLeg
+    inState(State.FixedSent)
+    condition(now <= T)
+    condition(now >= forTime)
+    condition(msg.value >= timeInterval * liborRate)
+  {
+    floatingLeg.transfer(amountToSend);
+    fixedLeg.transfer(msg.value);
+    state = State.FloatingSent;
+    emit FloatingPaymentSent(floatingLeg, fixedLeg, msg.value);
+  }
+  
+}

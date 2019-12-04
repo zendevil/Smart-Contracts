@@ -1,0 +1,34 @@
+const forward = artifacts.require("forward");
+const mode = process.env.MODE;
+
+contract("forward", accounts => {
+  after("write coverage/profiler output", async () => {
+    if (mode === "profile") {
+      await global.profilerSubprovider.writeProfilerOutputAsync();
+    } else if (mode === "coverage") {
+      await global.coverageSubprovider.writeCoverageAsync();
+    }
+  });
+    
+  it("should send coin correctly", async () => {
+      const forwardInstance = await forward.deployed(500, 50, 80);
+    
+    const accountOne = accounts[0];
+    const accountTwo = accounts[1];
+    const amount = 2; // The balance of the owner (account[0]) is 1 (assigned in the constructor), so the transaction sending 2 will fail.
+    if (mode === "profile") {
+      global.profilerSubprovider.start();
+    }
+
+      
+    await forwardInstance.long(
+      { from: accountOne }
+    );
+
+
+      
+    if (mode === "profile") {
+      global.profilerSubprovider.stop();
+    }
+  });
+});
