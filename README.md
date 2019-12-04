@@ -20,7 +20,7 @@ Outline of the contract
 function short(uint _T, uint _deliveryPrice, uint _stockPrice)                                                                                                                                                                              
     public                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
     inState(State.Created)
-	```
+```
 
 When calling the function short, the shorting party passes in three parameters, _T, _deliveryPrice and _stockPrice. _T specifies the maturity of the contract, _deliveryPrice specifies the shorting party’s offered delivery price and the _stockPrice is the price of the stock at t = 0. The keyword public ensures that the function is callable from outside the contract source-file. inState(State.Created) ensures that the function is only callable in the state created. This would ensure, for example, that short cannot be called in the later stages of the contract.
 
